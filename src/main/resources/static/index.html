@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Payroll Management</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="background-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+    </div>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar glass-panel">
+            <div class="brand">
+                <i class="fa-solid fa-wallet fa-2x"></i>
+                <h2>PaySync</h2>
+            </div>
+            <ul class="nav-links">
+                <li class="active"><i class="fa-solid fa-chart-pie"></i> Dashboard</li>
+                <li onclick="openModal('addEmployeeModal')"><i class="fa-solid fa-user-plus"></i> Add Employee</li>
+                <li><i class="fa-solid fa-file-invoice-dollar"></i> Salary Slips</li>
+                <li><i class="fa-solid fa-gear"></i> Settings</li>
+            </ul>
+            <div class="user-profile">
+                <img src="https://ui-avatars.com/api/?name=Admin+User&background=6c5ce7&color=fff" alt="Admin">
+                <div>
+                    <h4>Admin</h4>
+                    <p>HR Manager</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar glass-panel">
+                <div class="search-box">
+                    <i class="fa-solid fa-search"></i>
+                    <input type="text" placeholder="Search employees...">
+                </div>
+                <div class="actions">
+                    <button class="btn btn-primary" onclick="openModal('addEmployeeModal')">
+                        <i class="fa-solid fa-plus"></i> New Employee
+                    </button>
+                    <div class="notifications"><i class="fa-solid fa-bell"></i><span class="badge">3</span></div>
+                </div>
+            </header>
+
+            <section class="dashboard-stats">
+                <div class="stat-card glass-panel">
+                    <div class="icon-wrapper blue"><i class="fa-solid fa-users"></i></div>
+                    <div class="stat-info">
+                        <h3>Total Employees</h3>
+                        <h2 id="totalEmployeesCount">0</h2>
+                    </div>
+                </div>
+                <div class="stat-card glass-panel">
+                    <div class="icon-wrapper green"><i class="fa-solid fa-money-bill-wave"></i></div>
+                    <div class="stat-info">
+                        <h3>Total Payroll</h3>
+                        <h2 id="totalPayrollAmount">$0.00</h2>
+                    </div>
+                </div>
+                <div class="stat-card glass-panel">
+                    <div class="icon-wrapper purple"><i class="fa-solid fa-chart-line"></i></div>
+                    <div class="stat-info">
+                        <h3>Avg. Salary</h3>
+                        <h2 id="avgSalaryAmount">$0.00</h2>
+                    </div>
+                </div>
+            </section>
+
+            <section class="employee-section glass-panel">
+                <div class="section-header">
+                    <h3>Employee Directory</h3>
+                    <button class="btn btn-secondary" onclick="fetchEmployees()"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="modern-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Employee Name</th>
+                                <th>Designation</th>
+                                <th>Basic Salary</th>
+                                <th>Net Salary</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="employeeTableBody">
+                            <!-- Data will be populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Add/Edit Employee Modal (Glassmorphism) -->
+    <div id="addEmployeeModal" class="modal-overlay">
+        <div class="modal-content glass-panel">
+            <div class="modal-header">
+                <h3 id="modalTitle">Add New Employee</h3>
+                <button class="close-btn" onclick="closeModal('addEmployeeModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="employeeForm">
+                <input type="hidden" id="empId">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="empName" required placeholder="e.g. John Doe">
+                </div>
+                <div class="form-group">
+                    <label>Designation</label>
+                    <input type="text" id="empDesignation" required placeholder="e.g. Software Engineer">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Basic Salary ($)</label>
+                        <input type="number" id="empBasic" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Allowances ($)</label>
+                        <input type="number" id="empAllowances" step="0.01" required value="0">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Deductions ($)</label>
+                    <input type="number" id="empDeductions" step="0.01" required value="0">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addEmployeeModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Employee</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Salary Slip Modal -->
+    <div id="salarySlipModal" class="modal-overlay">
+        <div class="modal-content glass-panel slip-modal">
+            <div class="modal-header">
+                <h3>Salary Slip</h3>
+                <button class="close-btn" onclick="closeModal('salarySlipModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="slip-content" id="slipContent">
+                <!-- Generated dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="window.print()"><i class="fa-solid fa-print"></i> Print Slip</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
