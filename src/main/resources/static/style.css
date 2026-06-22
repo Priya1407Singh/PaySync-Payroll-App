@@ -514,3 +514,73 @@ body.dark-theme .setting-item {
 body.dark-theme .modal-content label, body.dark-theme .setting-info h4 {
     color: #f5f6fa;
 }
+
+/* --- Responsive Design for Mobile --- */
+@media (max-width: 768px) {
+    .app-container {
+        flex-direction: column;
+        height: auto;
+        padding: 10px;
+    }
+
+    .sidebar {
+        width: 100%;
+        padding: 15px;
+    }
+
+    .brand {
+        margin-bottom: 20px;
+        justify-content: center;
+    }
+
+    .nav-links {
+        display: flex;
+        overflow-x: auto;
+        gap: 10px;
+    }
+
+    .nav-links li {
+        white-space: nowrap;
+        margin-bottom: 0;
+        padding: 10px 15px;
+    }
+
+    .user-profile {
+        justify-content: center;
+    }
+
+    .top-bar {
+        flex-direction: column;
+        height: auto;
+        gap: 15px;
+        padding: 15px;
+    }
+
+    .search-box {
+        width: 100%;
+    }
+
+    .actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .dashboard-stats {
+        flex-direction: column;
+    }
+
+    .login-container, .modal-content, .slip-modal {
+        width: 95% !important;
+        padding: 20px;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .action-btns {
+        flex-direction: column;
+        gap: 5px;
+    }
+}
