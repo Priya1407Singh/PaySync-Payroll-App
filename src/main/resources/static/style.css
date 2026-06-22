@@ -580,7 +580,62 @@ body.dark-theme .modal-content label, body.dark-theme .setting-info h4 {
     }
 
     .action-btns {
-        flex-direction: column;
-        gap: 5px;
+        flex-direction: row;
+        gap: 10px;
+        justify-content: flex-end;
+    }
+
+    /* Mobile Table as Cards */
+    .modern-table, .modern-table tbody, .modern-table tr, .modern-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .modern-table thead {
+        display: none;
+    }
+
+    .modern-table tr {
+        margin-bottom: 15px;
+        border: 1px solid var(--glass-border);
+        border-radius: 12px;
+        padding: 10px;
+        background: rgba(255, 255, 255, 0.4);
+    }
+
+    body.dark-theme .modern-table tr {
+        background: rgba(0, 0, 0, 0.2);
+    }
+
+    .modern-table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 5px;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        text-align: right;
+    }
+
+    body.dark-theme .modern-table td {
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .modern-table td:last-child {
+        border-bottom: none;
+        padding-top: 15px;
+        padding-bottom: 5px;
+    }
+
+    .modern-table td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        font-size: 0.85em;
+        text-align: left;
+    }
+
+    .emp-name-cell {
+        justify-content: flex-end;
     }
 }

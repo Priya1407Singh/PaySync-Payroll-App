@@ -87,17 +87,17 @@ function renderEmployeeTable(employees) {
     employees.forEach(emp => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td>#${emp.id}</td>
-            <td>
+            <td data-label="ID">#${emp.id}</td>
+            <td data-label="Employee">
                 <div class="emp-name-cell">
                     <div class="avatar">${emp.name.charAt(0).toUpperCase()}</div>
                     ${emp.name}
                 </div>
             </td>
-            <td>${emp.designation}</td>
-            <td>$${emp.basicSalary.toFixed(2)}</td>
-            <td style="font-weight: bold; color: var(--success);">$${emp.netSalary.toFixed(2)}</td>
-            <td>
+            <td data-label="Designation">${emp.designation}</td>
+            <td data-label="Basic Salary">$${emp.basicSalary.toFixed(2)}</td>
+            <td data-label="Net Salary" style="font-weight: bold; color: var(--success);">$${emp.netSalary.toFixed(2)}</td>
+            <td data-label="Actions">
                 <div class="action-btns">
                     <button class="btn btn-info" onclick="viewSalarySlip(${emp.id})" title="Salary Slip"><i class="fa-solid fa-file-invoice-dollar"></i></button>
                     <button class="btn btn-secondary" style="padding: 6px 12px;" onclick="editEmployee(${emp.id})" title="Edit"><i class="fa-solid fa-pen"></i></button>
