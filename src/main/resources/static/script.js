@@ -1,24 +1,76 @@
 const API_URL = '/api/employees';
+let allEmployees = []; // Store globally for search
 
 // Initialization
 document.addEventListener('DOMContentLoaded', () => {
-    fetchEmployees();
+    // Check if user is "logged in" using localStorage (optional, but good for refresh)
+    if(localStorage.getItem('isLoggedIn') === 'true') {
+        document.getElementById('loginPage').style.display = 'none';
+        document.getElementById('appPage').style.display = 'flex';
+        fetchEmployees();
+    }
+
+    // Login Form Handler
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const user = document.getElementById('loginUser').value;
+        const pass = document.getElementById('loginPass').value;
+
+        if(user === 'admin' && pass === 'admin') {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('appPage').style.display = 'flex';
+            localStorage.setItem('isLoggedIn', 'true');
+            fetchEmployees();
+        } else {
+            alert('Invalid credentials! Hint: use admin/admin');
+        }
+    });
 
     document.getElementById('employeeForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         await saveEmployee();
     });
+
+    // Search functionality
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase();
+        const filtered = allEmployees.filter(emp => 
+            emp.name.toLowerCase().includes(term) || 
+            emp.designation.toLowerCase().includes(term)
+        );
+        renderEmployeeTable(filtered);
+    });
 });
+
+// Logout Functionality
+function logout() {
+    localStorage.removeItem('isLoggedIn');
+    closeModal('adminModal');
+    document.getElementById('appPage').style.display = 'none';
+    document.getElementById('loginPage').style.display = 'flex';
+    document.getElementById('loginPass').value = ''; // Clear password
+}
 
 // Fetch all employees and update Dashboard
 async function fetchEmployees() {
+    const tbody = document.getElementById('employeeTableBody');
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:30px;"><i class="fa-solid fa-spinner fa-spin" style="font-size: 2em; color: var(--primary);"></i><br><br>Refreshing data...</td></tr>`;
+    
     try {
         const response = await fetch(API_URL);
         const employees = await response.json();
-        renderEmployeeTable(employees);
-        updateDashboardStats(employees);
+        
+        // Add a tiny fake delay so the user "feels" the refresh happening
+        setTimeout(() => {
+            allEmployees = employees; // Store for search filtering
+            renderEmployeeTable(employees);
+            updateDashboardStats(employees);
+            showToast('Table data refreshed successfully!');
+        }, 600);
+        
     } catch (error) {
         console.error('Error fetching employees:', error);
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:30px; color: var(--danger);">Error connecting to server!</td></tr>`;
     }
 }
 
@@ -181,8 +233,64 @@ async function viewSalarySlip(id) {
         `;
         
         document.getElementById('slipContent').innerHTML = slipHtml;
+        closeModal('selectSlipModal'); // Close select modal if open
         openModal('salarySlipModal');
     } catch (error) {
         console.error('Error generating salary slip:', error);
+    }
+}
+
+// Open Select Slip Modal
+function openSelectSlipModal() {
+    const select = document.getElementById('slipEmployeeSelect');
+    select.innerHTML = '';
+    
+    if (allEmployees.length === 0) {
+        select.innerHTML = '<option value="">No employees available</option>';
+    } else {
+        allEmployees.forEach(emp => {
+            const option = document.createElement('option');
+            option.value = emp.id;
+            option.innerText = `#${emp.id} - ${emp.name} (${emp.designation})`;
+            select.appendChild(option);
+        });
+    }
+    
+    openModal('selectSlipModal');
+}
+
+// Generate Slip from Select Modal
+function generateSlipFromSelect() {
+    const select = document.getElementById('slipEmployeeSelect');
+    const id = select.value;
+    if (id) {
+        viewSalarySlip(id);
+    } else {
+        alert("Please add an employee first!");
+    }
+}
+
+// Toast Notification
+function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.innerText = message;
+    toast.style.visibility = 'visible';
+    toast.style.opacity = '1';
+    
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.style.visibility = 'hidden', 300);
+    }, 2500);
+}
+
+// Toggle Dark Mode Theme
+function toggleTheme() {
+    document.body.classList.toggle('dark-theme');
+    const isDark = document.body.classList.contains('dark-theme');
+    
+    if (isDark) {
+        showToast('Dark Mode Enabled!');
+    } else {
+        showToast('Light Mode Enabled!');
     }
 }

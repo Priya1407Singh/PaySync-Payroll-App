@@ -15,7 +15,26 @@
         <div class="shape shape-3"></div>
     </div>
 
-    <div class="app-container">
+    <!-- Login Page -->
+    <div class="login-container glass-panel" id="loginPage">
+        <i class="fa-solid fa-wallet fa-3x" style="color: var(--primary);"></i>
+        <h2>Welcome to PaySync</h2>
+        <p style="color: #636e72; margin-bottom: 25px;">Enter your credentials to access the dashboard</p>
+        
+        <form id="loginForm" style="width: 100%;">
+            <div class="form-group" style="text-align: left;">
+                <label>Username</label>
+                <input type="text" id="loginUser" placeholder="admin" required value="admin">
+            </div>
+            <div class="form-group" style="text-align: left;">
+                <label>Password</label>
+                <input type="password" id="loginPass" placeholder="admin" required value="admin">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;">Login</button>
+        </form>
+    </div>
+
+    <div class="app-container" id="appPage">
         <!-- Sidebar Navigation -->
         <aside class="sidebar glass-panel">
             <div class="brand">
@@ -25,10 +44,10 @@
             <ul class="nav-links">
                 <li class="active"><i class="fa-solid fa-chart-pie"></i> Dashboard</li>
                 <li onclick="openModal('addEmployeeModal')"><i class="fa-solid fa-user-plus"></i> Add Employee</li>
-                <li><i class="fa-solid fa-file-invoice-dollar"></i> Salary Slips</li>
-                <li><i class="fa-solid fa-gear"></i> Settings</li>
+                <li onclick="openSelectSlipModal()"><i class="fa-solid fa-file-invoice-dollar"></i> Salary Slips</li>
+                <li onclick="openModal('settingsModal')"><i class="fa-solid fa-gear"></i> Settings</li>
             </ul>
-            <div class="user-profile">
+            <div class="user-profile" style="cursor:pointer;" onclick="openModal('adminModal')">
                 <img src="https://ui-avatars.com/api/?name=Admin+User&background=6c5ce7&color=fff" alt="Admin">
                 <div>
                     <h4>Admin</h4>
@@ -42,32 +61,35 @@
             <header class="top-bar glass-panel">
                 <div class="search-box">
                     <i class="fa-solid fa-search"></i>
-                    <input type="text" placeholder="Search employees...">
+                    <input type="text" id="searchInput" placeholder="Search employees...">
                 </div>
                 <div class="actions">
                     <button class="btn btn-primary" onclick="openModal('addEmployeeModal')">
                         <i class="fa-solid fa-plus"></i> New Employee
                     </button>
-                    <div class="notifications"><i class="fa-solid fa-bell"></i><span class="badge">3</span></div>
+                    <div class="notifications" style="cursor: pointer; position: relative;" onclick="openModal('notificationsModal')">
+                        <i class="fa-solid fa-bell" style="font-size: 1.2em;"></i>
+                        <span class="badge" style="position: absolute; top: -8px; right: -10px; background: var(--danger); color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.7em; font-weight: bold;">3</span>
+                    </div>
                 </div>
             </header>
 
             <section class="dashboard-stats">
-                <div class="stat-card glass-panel">
+                <div class="stat-card glass-panel" onclick="document.querySelector('.employee-section').scrollIntoView({behavior: 'smooth'})" style="cursor: pointer;">
                     <div class="icon-wrapper blue"><i class="fa-solid fa-users"></i></div>
                     <div class="stat-info">
                         <h3>Total Employees</h3>
                         <h2 id="totalEmployeesCount">0</h2>
                     </div>
                 </div>
-                <div class="stat-card glass-panel">
+                <div class="stat-card glass-panel" onclick="document.querySelector('.employee-section').scrollIntoView({behavior: 'smooth'})" style="cursor: pointer;">
                     <div class="icon-wrapper green"><i class="fa-solid fa-money-bill-wave"></i></div>
                     <div class="stat-info">
                         <h3>Total Payroll</h3>
                         <h2 id="totalPayrollAmount">$0.00</h2>
                     </div>
                 </div>
-                <div class="stat-card glass-panel">
+                <div class="stat-card glass-panel" onclick="document.querySelector('.employee-section').scrollIntoView({behavior: 'smooth'})" style="cursor: pointer;">
                     <div class="icon-wrapper purple"><i class="fa-solid fa-chart-line"></i></div>
                     <div class="stat-info">
                         <h3>Avg. Salary</h3>
@@ -155,6 +177,133 @@
                 <button type="button" class="btn btn-primary" onclick="window.print()"><i class="fa-solid fa-print"></i> Print Slip</button>
             </div>
         </div>
+    </div>
+
+    <!-- Select Employee for Slip Modal -->
+    <div id="selectSlipModal" class="modal-overlay">
+        <div class="modal-content glass-panel" style="width: 400px;">
+            <div class="modal-header">
+                <h3>Generate Salary Slip</h3>
+                <button class="close-btn" onclick="closeModal('selectSlipModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="form-group">
+                <label>Select an Employee</label>
+                <select id="slipEmployeeSelect" style="width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ccc; background: #fff; font-size: 1em;">
+                    <!-- Options populated via JS -->
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="generateSlipFromSelect()">Generate Slip</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal-overlay">
+        <div class="modal-content glass-panel" style="width: 450px;">
+            <div class="modal-header">
+                <h3>System Settings</h3>
+                <button class="close-btn" onclick="closeModal('settingsModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="settings-list">
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h4>Email Notifications</h4>
+                        <p>Receive updates on payroll processing</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="toggleEmail" onchange="showToast('Email Notifications updated!')" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h4>Auto-Generate Slips</h4>
+                        <p>Generate slips automatically on month end</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="toggleAutoSlip" onchange="showToast('Auto-Generate Slips updated!')" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h4>Dark Mode</h4>
+                        <p>Switch to dark theme</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="toggleDarkMode" onchange="toggleTheme()">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h4>Two-Factor Auth (2FA)</h4>
+                        <p>Enhance admin security</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="toggle2FA" onchange="showToast('2FA settings updated!')">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer" style="margin-top: 20px;">
+                <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="closeModal('settingsModal'); showToast('Settings saved successfully!');">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications Modal -->
+    <div id="notificationsModal" class="modal-overlay">
+        <div class="modal-content glass-panel" style="width: 450px;">
+            <div class="modal-header">
+                <h3>Notifications (3)</h3>
+                <button class="close-btn" onclick="closeModal('notificationsModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 10px;">
+                <div style="background: rgba(108, 92, 231, 0.1); padding: 15px; border-radius: 10px; border-left: 4px solid var(--primary);">
+                    <strong>Payroll Processed</strong><br>
+                    <span style="font-size: 0.9em; color: var(--text-muted);">May 2026 payroll has been successfully calculated for all employees.</span>
+                </div>
+                <div style="background: rgba(0, 184, 148, 0.1); padding: 15px; border-radius: 10px; border-left: 4px solid var(--success);">
+                    <strong>New Employee Onboarded</strong><br>
+                    <span style="font-size: 0.9em; color: var(--text-muted);">Please review the salary structure for the newest hire.</span>
+                </div>
+                <div style="background: rgba(214, 48, 49, 0.1); padding: 15px; border-radius: 10px; border-left: 4px solid var(--danger);">
+                    <strong>Pending Approval</strong><br>
+                    <span style="font-size: 0.9em; color: var(--text-muted);">Leave request pending for HR Manager approval.</span>
+                </div>
+            </div>
+            <div class="modal-footer" style="margin-top: 20px;">
+                <button class="btn btn-secondary" style="width: 100%; justify-content: center;" onclick="closeModal('notificationsModal'); showToast('All notifications marked as read.');">Mark All as Read</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Profile Modal -->
+    <div id="adminModal" class="modal-overlay">
+        <div class="modal-content glass-panel" style="width: 350px; text-align: center;">
+            <div class="modal-header">
+                <h3>Admin Profile</h3>
+                <button class="close-btn" onclick="closeModal('adminModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div style="padding: 10px 0;">
+                <img src="https://ui-avatars.com/api/?name=Admin+User&background=6c5ce7&color=fff&size=100" style="border-radius: 50%; margin-bottom: 15px;">
+                <h3 style="margin-bottom: 5px;">Administrator</h3>
+                <p style="color: var(--primary); font-weight: 500; margin-bottom: 15px;">Chief HR Manager</p>
+                <div style="text-align: left; background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                    <div style="margin-bottom: 8px;"><strong>Email:</strong> admin@paysync.com</div>
+                    <div style="margin-bottom: 8px;"><strong>Access Level:</strong> Super Admin</div>
+                    <div><strong>Last Login:</strong> Today</div>
+                </div>
+                <button class="btn btn-danger" style="width: 100%; justify-content: center;" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification (Hidden by default) -->
+    <div id="toast" style="visibility: hidden; min-width: 250px; background-color: var(--primary); color: #fff; text-align: center; border-radius: 10px; padding: 16px; position: fixed; z-index: 9999; bottom: 30px; left: 50%; transform: translateX(-50%); font-size: 15px; font-weight: 500; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: opacity 0.3s, bottom 0.3s;">
+        Notification message
     </div>
 
     <script src="script.js"></script>
