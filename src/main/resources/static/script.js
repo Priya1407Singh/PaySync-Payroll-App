@@ -173,6 +173,9 @@ async function editEmployee(id) {
         const response = await fetch(`${API_URL}/${id}`);
         const emp = await response.json();
         
+        // Open modal first so it resets, THEN populate our data
+        openModal('addEmployeeModal');
+        
         document.getElementById('empId').value = emp.id;
         document.getElementById('empName').value = emp.name;
         document.getElementById('empDesignation').value = emp.designation;
@@ -181,7 +184,6 @@ async function editEmployee(id) {
         document.getElementById('empDeductions').value = emp.deductions;
 
         document.getElementById('modalTitle').innerText = 'Edit Employee';
-        openModal('addEmployeeModal');
     } catch (error) {
         console.error('Error fetching employee details:', error);
     }
